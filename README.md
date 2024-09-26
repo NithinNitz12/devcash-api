@@ -15,6 +15,11 @@ Go to the project directory
   cd api
 ```
 
+Open `.env` file set your desired `PORT` address
+```env
+PORT = <PORT Number>
+```
+
 Install dependencies
 
 ```bash
