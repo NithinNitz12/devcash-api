@@ -15,6 +15,7 @@ app.get("/api/bounty/:id", async (req, res) => {
 
     const bounty_title = $("h1.font-extrabold").text();
     const bounty_amount = $("h2.font-extrabold").text();
+    const bounty_xDAI = $("h3.text-lg").text();
     const bounty_description = $("div.editor-content").text();
 
     // const bounty_scope = $("p.text-lg.font-bold.mr-1").text();
@@ -75,6 +76,7 @@ app.get("/api/bounty/:id", async (req, res) => {
     res.json({
       bounty_title,
       bounty_amount,
+      bounty_xDAI,
       bounty_description,
       bounty_smart_contract_addresss,
       bounty_created_by,
