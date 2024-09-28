@@ -46,7 +46,7 @@ Start the server
 
 Takes bounty id and returns the bounty details.
 
-```get response
+```json
 {
   "bounty_title": "Js Program to Scrape Bounties",
   "bounty_amount": "{D}0",

@@ -1,10 +1,29 @@
 const express = require("express");
 const axios = require("axios");
 const cheerio = require("cheerio");
-require('dotenv').config();
+require("dotenv").config();
 
 const app = express();
 app.use(express.json());
+
+app.get("/api/bounty/all", async (req, res) => {
+  const url = "https://devcash.dev/bountyplatform";
+
+  try {
+    const response = await axios.get(url);
+    // console.log("test= ",response)
+    const $ = cheerio.load(response.data);
+
+    const test = $('h4.font-extrabold').text();
+    console.log("test= ",test)
+      
+
+    res.json(test);
+  } catch (error) {
+    console.error(error);
+    res.status(404).send("Bounties not found");
+  }
+});
 
 app.get("/api/bounty/:id", async (req, res) => {
   const id = req.params.id;
@@ -15,14 +34,19 @@ app.get("/api/bounty/:id", async (req, res) => {
     const $ = cheerio.load(response.data);
 
     const bounty_title = $("h1.font-extrabold").text();
-    const bounty_amount = $("h2.font-extrabold").text();
-    const bounty_xDAI = $("h3.text-lg").text();
-    const bounty_description = $("div.editor-content").text();
+    const bounty_amount = $("h2.font-extrabold").text().slice(3);
+    const bounty_xDAI = $(
+      "h3.text-lg.md\\:text-xl.text-left.md\\:text-right.mt-1"
+    )
+      .text()
+      .slice(3);
 
-    // const bounty_scope = $("p.text-lg.font-bold.mr-1").text();
-    // console.log("bounty_scope ", bounty_scope)
+    const bounty_description = $(
+      "div.bg-c-background-sec.shadow-lg.w-full.md\\:w-auto.flex-1.flex.flex-col.flex-wrap.relative.rounded-tl-3xl.rounded-br-3xl.rounded-tr-lg.rounded-bl-lg.pt-6.pb-8.md\\:pt-10.md\\:pb-12.px-6.md\\:px-12.my-1.md\\:my-2"
+    ).text();
 
     const bounty_scope = $("p.text-lg.font-bold.mr-1").text().trim();
+    console.log(bounty_scope);
 
     let bounty_scope_result;
     if (bounty_scope.includes("Created for")) {
@@ -73,6 +97,9 @@ app.get("/api/bounty/:id", async (req, res) => {
 
     const bounty_deadline = extracted_bounty_details.text[1];
     const bountiesLeft = extracted_bounty_details.text[0];
+    const bounty_category = $(
+      "span.border.border-c-text-10.shadow-lg.font-bold.opacity-100.px-3.py-1.rounded-full"
+    ).text();
 
     res.json({
       bounty_title,
@@ -84,6 +111,7 @@ app.get("/api/bounty/:id", async (req, res) => {
       bounty_deadline,
       bountiesLeft,
       bounty_scope_result,
+      bounty_category,
     });
   } catch (error) {
     console.error(error);
