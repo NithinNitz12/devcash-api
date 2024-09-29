@@ -7,22 +7,32 @@ const app = express();
 app.use(express.json());
 
 app.get("/api/bounty/all", async (req, res) => {
-  const url = "https://devcash.dev/bountyplatform";
+  let id = 152;
+  const idsToSkip = [172, 179, 186];
+  const results = [];
 
-  try {
-    const response = await axios.get(url);
-    // console.log("test= ",response)
-    const $ = cheerio.load(response.data);
+  while (true) {
+    try {
+      const url = `https://devcash.dev/bountyplatform/bounty/${id}`;
+      const response = await axios.get(url);
+      const $ = cheerio.load(response.data);
 
-    const test = $('h4.font-extrabold').text();
-    console.log("test= ",test)
-      
+      const bounty_title = $("h1.font-extrabold").text();
 
-    res.json(test);
-  } catch (error) {
-    console.error(error);
-    res.status(404).send("Bounties not found");
+      results.push({ id, bounty_title });
+    } catch (error) {
+      if (error.message.includes("500")) {
+        res.json(results);
+        return;
+      }
+    }
+
+    id++;
+    if (idsToSkip.includes(id)) {
+      id++;
+    }
   }
+  console.log("END");
 });
 
 app.get("/api/bounty/:id", async (req, res) => {
@@ -46,7 +56,7 @@ app.get("/api/bounty/:id", async (req, res) => {
     ).text();
 
     const bounty_scope = $("p.text-lg.font-bold.mr-1").text().trim();
-    console.log(bounty_scope);
+    // console.log("bounty_scope",bounty_scope);
 
     let bounty_scope_result;
     if (bounty_scope.includes("Created for")) {
